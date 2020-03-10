@@ -96,15 +96,17 @@ Shader "UIKit/UIImage/UIImage_Static_Outline_Alpha" {
 			}
 
 			fixed4 frag(v2f IN) : SV_Target {
-				float4 col11 = tex2D(_MainTex, float2(IN.texcoord.x - _OutlineWidth, IN.texcoord.y + _OutlineWidth));
-				float4 col12 = tex2D(_MainTex, float2(IN.texcoord.x, IN.texcoord.y + _OutlineWidth));
-				float4 col13 = tex2D(_MainTex, float2(IN.texcoord.x + _OutlineWidth, IN.texcoord.y + _OutlineWidth));
-				float4 col21 = tex2D(_MainTex, float2(IN.texcoord.x - _OutlineWidth, IN.texcoord.y));
+				float validDistance = _OutlineWidth * 1000.0f / _ScreenParams.y;
+
+				float4 col11 = tex2D(_MainTex, float2(IN.texcoord.x - validDistance, IN.texcoord.y + validDistance));
+				float4 col12 = tex2D(_MainTex, float2(IN.texcoord.x, IN.texcoord.y + validDistance));
+				float4 col13 = tex2D(_MainTex, float2(IN.texcoord.x + validDistance, IN.texcoord.y + validDistance));
+				float4 col21 = tex2D(_MainTex, float2(IN.texcoord.x - validDistance, IN.texcoord.y));
 				float4 col22 = tex2D(_MainTex, IN.texcoord);
-				float4 col23 = tex2D(_MainTex, float2(IN.texcoord.x + _OutlineWidth, IN.texcoord.y));
-				float4 col31 = tex2D(_MainTex, float2(IN.texcoord.x - _OutlineWidth, IN.texcoord.y - _OutlineWidth));
-				float4 col32 = tex2D(_MainTex, float2(IN.texcoord.x, IN.texcoord.y - _OutlineWidth));
-				float4 col33 = tex2D(_MainTex, float2(IN.texcoord.x + _OutlineWidth, IN.texcoord.y - _OutlineWidth));
+				float4 col23 = tex2D(_MainTex, float2(IN.texcoord.x + validDistance, IN.texcoord.y));
+				float4 col31 = tex2D(_MainTex, float2(IN.texcoord.x - validDistance, IN.texcoord.y - validDistance));
+				float4 col32 = tex2D(_MainTex, float2(IN.texcoord.x, IN.texcoord.y - validDistance));
+				float4 col33 = tex2D(_MainTex, float2(IN.texcoord.x + validDistance, IN.texcoord.y - validDistance));
 
 				half4 color = (col22 + _TextureSampleAdd) * IN.color;
 
@@ -113,7 +115,7 @@ Shader "UIKit/UIImage/UIImage_Static_Outline_Alpha" {
 					color = _OutlineColor;
 					float validAplhaJudge = (col11.a + col12.a + col13.a + col21.a + col22.a*2.0f + col23.a + col31.a + col32.a + col33.a)*0.1f;
 					if (_DecayImage == 0) {
-						validAplhaJudge *= 3.0f;
+						validAplhaJudge *= 5.0f;
 					}
 
 					color.a = smoothstep(0, 1, validAplhaJudge);

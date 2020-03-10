@@ -58,7 +58,7 @@ Material:
     m_Floats:
     - _Alpha: 1
     - _BlurAlpha: 1
-    - _BlurDistance: 0.006
+    - _BlurDistance: 0.004
     - _BumpScale: 1
     - _ColorMask: 15
     - _Cutoff: 0.5

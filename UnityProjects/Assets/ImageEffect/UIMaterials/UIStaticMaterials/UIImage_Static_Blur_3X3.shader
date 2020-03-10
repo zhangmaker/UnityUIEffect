@@ -100,17 +100,18 @@ Shader "UIKit/UIImage/UIImage_Static_Blur3X3" {
 				return OUT;
 			}
 
-			float4 frag(v2f IN) : SV_Target {
+			float4 frag(v2f IN) : SV_Target{
+				float validDistance = _BlurDistance * 1000.0f / _ScreenParams.y;
 				// sample texture an blur
-				float4 col1 = tex2D(_MainTex, float2(IN.texcoord.x - _BlurDistance, IN.texcoord.y + _BlurDistance));
-				float4 col2 = tex2D(_MainTex, float2(IN.texcoord.x, IN.texcoord.y + _BlurDistance));
-				float4 col3 = tex2D(_MainTex, float2(IN.texcoord.x + _BlurDistance, IN.texcoord.y + _BlurDistance)) ;
-				float4 col4 = tex2D(_MainTex, float2(IN.texcoord.x - _BlurDistance, IN.texcoord.y));
+				float4 col1 = tex2D(_MainTex, float2(IN.texcoord.x - validDistance, IN.texcoord.y + validDistance));
+				float4 col2 = tex2D(_MainTex, float2(IN.texcoord.x, IN.texcoord.y + validDistance));
+				float4 col3 = tex2D(_MainTex, float2(IN.texcoord.x + validDistance, IN.texcoord.y + validDistance)) ;
+				float4 col4 = tex2D(_MainTex, float2(IN.texcoord.x - validDistance, IN.texcoord.y));
 				float4 col5 = tex2D(_MainTex, IN.texcoord);
-				float4 col6 = tex2D(_MainTex, float2(IN.texcoord.x + _BlurDistance, IN.texcoord.y));
-				float4 col7 = tex2D(_MainTex, float2(IN.texcoord.x - _BlurDistance, IN.texcoord.y - _BlurDistance));
-				float4 col8 = tex2D(_MainTex, float2(IN.texcoord.x, IN.texcoord.y - _BlurDistance));
-				float4 col9 = tex2D(_MainTex, float2(IN.texcoord.x + _BlurDistance, IN.texcoord.y - _BlurDistance));
+				float4 col6 = tex2D(_MainTex, float2(IN.texcoord.x + validDistance, IN.texcoord.y));
+				float4 col7 = tex2D(_MainTex, float2(IN.texcoord.x - validDistance, IN.texcoord.y - validDistance));
+				float4 col8 = tex2D(_MainTex, float2(IN.texcoord.x, IN.texcoord.y - validDistance));
+				float4 col9 = tex2D(_MainTex, float2(IN.texcoord.x + validDistance, IN.texcoord.y - validDistance));
 
 				float4 finColor = lerp(col5, (col1* GaussianKernel[0] + col2 * GaussianKernel[1] + col3 * GaussianKernel[2] +
 						col4* GaussianKernel[3] + col5 * GaussianKernel[4] + col6 * GaussianKernel[5] +

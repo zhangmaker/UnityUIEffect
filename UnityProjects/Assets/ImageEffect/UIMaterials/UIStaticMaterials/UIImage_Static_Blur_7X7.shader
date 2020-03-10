@@ -98,14 +98,15 @@ Shader "UIKit/UIImage/UIImage_Static_Blur_7X7" {
 			}
 
 			float4 frag(v2f IN) : SV_Target {
+				float validDistance = _BlurDistance * 1000.0f / _ScreenParams.y;
 				// sample texture an blur
-				float4 col1 = tex2D(_MainTex, float2(IN.texcoord.x - 3.0f * _BlurDistance, IN.texcoord.y));
-				float4 col2 = tex2D(_MainTex, float2(IN.texcoord.x - 2.0f * _BlurDistance, IN.texcoord.y));
-				float4 col3 = tex2D(_MainTex, float2(IN.texcoord.x - 1.0f * _BlurDistance, IN.texcoord.y));
+				float4 col1 = tex2D(_MainTex, float2(IN.texcoord.x - 3.0f * validDistance, IN.texcoord.y));
+				float4 col2 = tex2D(_MainTex, float2(IN.texcoord.x - 2.0f * validDistance, IN.texcoord.y));
+				float4 col3 = tex2D(_MainTex, float2(IN.texcoord.x - 1.0f * validDistance, IN.texcoord.y));
 				float4 col4 = tex2D(_MainTex, IN.texcoord);
-				float4 col5 = tex2D(_MainTex, float2(IN.texcoord.x + 1.0f * _BlurDistance, IN.texcoord.y));
-				float4 col6 = tex2D(_MainTex, float2(IN.texcoord.x + 2.0f * _BlurDistance, IN.texcoord.y));
-				float4 col7 = tex2D(_MainTex, float2(IN.texcoord.x + 3.0f * _BlurDistance, IN.texcoord.y));
+				float4 col5 = tex2D(_MainTex, float2(IN.texcoord.x + 1.0f * validDistance, IN.texcoord.y));
+				float4 col6 = tex2D(_MainTex, float2(IN.texcoord.x + 2.0f * validDistance, IN.texcoord.y));
+				float4 col7 = tex2D(_MainTex, float2(IN.texcoord.x + 3.0f * validDistance, IN.texcoord.y));
 
 				float4 finColor = (col1* GaussianKernel[0] + col2 * GaussianKernel[1] + col3 * GaussianKernel[2] +
 						col4* GaussianKernel[3] + col5 * GaussianKernel[4] + col6 * GaussianKernel[5] +
@@ -176,14 +177,15 @@ Shader "UIKit/UIImage/UIImage_Static_Blur_7X7" {
 			}
 
 			float4 frag(v2f IN) : SV_Target{
+				float validDistance = _BlurDistance * 1000.0f / _ScreenParams.y;
 				// sample texture an blur
-				float4 col1 = tex2Dproj(_BlurTexture, float4(IN.grabPosition.x, IN.grabPosition.y - 3 * _BlurDistance, IN.grabPosition.z, IN.grabPosition.w));
-				float4 col2 = tex2Dproj(_BlurTexture, float4(IN.grabPosition.x, IN.grabPosition.y - 2 * _BlurDistance, IN.grabPosition.z, IN.grabPosition.w));
-				float4 col3 = tex2Dproj(_BlurTexture, float4(IN.grabPosition.x, IN.grabPosition.y - 1 * _BlurDistance, IN.grabPosition.z, IN.grabPosition.w));
+				float4 col1 = tex2Dproj(_BlurTexture, float4(IN.grabPosition.x, IN.grabPosition.y - 3 * validDistance, IN.grabPosition.z, IN.grabPosition.w));
+				float4 col2 = tex2Dproj(_BlurTexture, float4(IN.grabPosition.x, IN.grabPosition.y - 2 * validDistance, IN.grabPosition.z, IN.grabPosition.w));
+				float4 col3 = tex2Dproj(_BlurTexture, float4(IN.grabPosition.x, IN.grabPosition.y - 1 * validDistance, IN.grabPosition.z, IN.grabPosition.w));
 				float4 col4 = tex2Dproj(_BlurTexture, IN.grabPosition);
-				float4 col5 = tex2Dproj(_BlurTexture, float4(IN.grabPosition.x, IN.grabPosition.y + 1 * _BlurDistance, IN.grabPosition.z, IN.grabPosition.w));
-				float4 col6 = tex2Dproj(_BlurTexture, float4(IN.grabPosition.x, IN.grabPosition.y + 2 * _BlurDistance, IN.grabPosition.z, IN.grabPosition.w));
-				float4 col7 = tex2Dproj(_BlurTexture, float4(IN.grabPosition.x, IN.grabPosition.y + 3 * _BlurDistance, IN.grabPosition.z, IN.grabPosition.w));
+				float4 col5 = tex2Dproj(_BlurTexture, float4(IN.grabPosition.x, IN.grabPosition.y + 1 * validDistance, IN.grabPosition.z, IN.grabPosition.w));
+				float4 col6 = tex2Dproj(_BlurTexture, float4(IN.grabPosition.x, IN.grabPosition.y + 2 * validDistance, IN.grabPosition.z, IN.grabPosition.w));
+				float4 col7 = tex2Dproj(_BlurTexture, float4(IN.grabPosition.x, IN.grabPosition.y + 3 * validDistance, IN.grabPosition.z, IN.grabPosition.w));
 				float4 colMain = tex2D(_MainTex, IN.texcoord);
 
 				float4 finColor = lerp(colMain, (col1* GaussianKernel[0] + col2 * GaussianKernel[1] + col3 * GaussianKernel[2] +

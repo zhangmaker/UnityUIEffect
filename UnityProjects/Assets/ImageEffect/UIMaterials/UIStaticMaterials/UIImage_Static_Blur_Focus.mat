@@ -56,14 +56,14 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _BlurDistance: 0.019
+    - _BlurDistance: 0.005
     - _BumpScale: 1
     - _CenterNotBlur: 0
-    - _CenterX: 0.04
-    - _CenterY: 0.39
+    - _CenterX: 0.47
+    - _CenterY: 0.62
     - _ColorMask: 15
     - _Cutoff: 0.5
-    - _DecayRadius: 0.16
+    - _DecayRadius: 0.29
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _GlossMapScale: 1
