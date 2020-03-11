@@ -13,12 +13,14 @@
 	Note: Bloom image must have mip feature
 */
 
-Shader "UIKit/UIImage/UIImage_Static_Bloom_Optimized" {
+Shader "UIKit/UIImage/UIImage_Static_Bloom" {
 	Properties {
 		[PerRendererData] _MainTex("Sprite Texture", 2D) = "white" {}
 		_BlurDistance("Blur Distance", Range(0.001, 0.2)) = 0.01
 		_BlurSampleLevel("Blur Sample Level", Range(0, 8)) = 0
 		_BlurBlendFactor("Blur Level", Range(0, 2)) = 0
+		_ThresholdColor("Threshold", Color) = (0,0,0,0)
+		[Toggle] _UseACESToneMapping("Use ACES ToneMapping", Int) = 0
 		_AdaptedLum("Adapted Lum", Range(0, 5)) = 1
 
 		[HideInInspector] _StencilComp("Stencil Comparison", Float) = 8
@@ -87,16 +89,24 @@ Shader "UIKit/UIImage/UIImage_Static_Bloom_Optimized" {
 			uniform sampler2D _MainTex;
 			uniform fixed4 _TextureSampleAdd;
 			uniform float4 _ClipRect;
+			uniform fixed4 _ThresholdColor;
 			uniform float _BlurDistance;
 			uniform float _BlurSampleLevel;
 			uniform float _BlurBlendFactor;
 			uniform float _AdaptedLum;
+			uniform int _UseACESToneMapping;
 
 			static float GaussianKernel[9] = {
 				0.0947416f, 0.118318f, 0.0947416f,
 				0.118318f, 0.147761, 0.118318f,
 				0.0947416f, 0.118318f, 0.0947416f
 			};
+
+			fixed4 thresholdColor(float4 pPos) {
+				fixed4 validColor = tex2Dlod(_MainTex, pPos);
+				validColor = validColor - _ThresholdColor;
+				return saturate(validColor);
+			}
 
 			float4 ACESToneMapping(float4 color, float adapted_lum) {
 				const float A = 2.51f;
@@ -124,15 +134,15 @@ Shader "UIKit/UIImage/UIImage_Static_Bloom_Optimized" {
 
 			float4 frag(v2f IN) : SV_Target{
 				// sample texture an blur
-				float4 col1 = tex2Dlod(_MainTex, float4(IN.texcoord.x - _BlurDistance, IN.texcoord.y + _BlurDistance, 0, _BlurSampleLevel));
-				float4 col2 = tex2Dlod(_MainTex, float4(IN.texcoord.x, IN.texcoord.y + _BlurDistance, 0, _BlurSampleLevel));
-				float4 col3 = tex2Dlod(_MainTex, float4(IN.texcoord.x + _BlurDistance, IN.texcoord.y + _BlurDistance, 0, _BlurSampleLevel));
-				float4 col4 = tex2Dlod(_MainTex, float4(IN.texcoord.x - _BlurDistance, IN.texcoord.y, 0, _BlurSampleLevel));
-				float4 col5 = tex2Dlod(_MainTex, float4(IN.texcoord.x, IN.texcoord.y, 0, _BlurSampleLevel));
-				float4 col6 = tex2Dlod(_MainTex, float4(IN.texcoord.x + _BlurDistance, IN.texcoord.y, 0, _BlurSampleLevel));
-				float4 col7 = tex2Dlod(_MainTex, float4(IN.texcoord.x - _BlurDistance, IN.texcoord.y - _BlurDistance, 0, _BlurSampleLevel));
-				float4 col8 = tex2Dlod(_MainTex, float4(IN.texcoord.x, IN.texcoord.y - _BlurDistance, 0, _BlurSampleLevel));
-				float4 col9 = tex2Dlod(_MainTex, float4(IN.texcoord.x + _BlurDistance, IN.texcoord.y - _BlurDistance, 0, _BlurSampleLevel));
+				fixed4 col1 = thresholdColor(float4(IN.texcoord.x - _BlurDistance, IN.texcoord.y + _BlurDistance, 0, _BlurSampleLevel));
+				fixed4 col2 = thresholdColor(float4(IN.texcoord.x, IN.texcoord.y + _BlurDistance, 0, _BlurSampleLevel));
+				fixed4 col3 = thresholdColor(float4(IN.texcoord.x + _BlurDistance, IN.texcoord.y + _BlurDistance, 0, _BlurSampleLevel));
+				fixed4 col4 = thresholdColor(float4(IN.texcoord.x - _BlurDistance, IN.texcoord.y, 0, _BlurSampleLevel));
+				fixed4 col5 = thresholdColor(float4(IN.texcoord.x, IN.texcoord.y, 0, _BlurSampleLevel));
+				fixed4 col6 = thresholdColor(float4(IN.texcoord.x + _BlurDistance, IN.texcoord.y, 0, _BlurSampleLevel));
+				fixed4 col7 = thresholdColor(float4(IN.texcoord.x - _BlurDistance, IN.texcoord.y - _BlurDistance, 0, _BlurSampleLevel));
+				fixed4 col8 = thresholdColor(float4(IN.texcoord.x, IN.texcoord.y - _BlurDistance, 0, _BlurSampleLevel));
+				fixed4 col9 = thresholdColor(float4(IN.texcoord.x + _BlurDistance, IN.texcoord.y - _BlurDistance, 0, _BlurSampleLevel));
 
 				float4 colMain = tex2D(_MainTex, IN.texcoord);
 				float4 lodColor = (col1* GaussianKernel[0] + col2 * GaussianKernel[1] + col3 * GaussianKernel[2] +
@@ -140,7 +150,9 @@ Shader "UIKit/UIImage/UIImage_Static_Bloom_Optimized" {
 						col7* GaussianKernel[6] + col8 * GaussianKernel[7] + col9* GaussianKernel[8]) * IN.color;
 
 				float4 finColor = colMain + lodColor * _BlurBlendFactor;
-				finColor = ACESToneMapping(finColor, _AdaptedLum);
+				if (_UseACESToneMapping != 0) {
+					finColor = ACESToneMapping(finColor, _AdaptedLum);
+				}
 				finColor.a = IN.color.a;
 
 #ifdef UNITY_UI_ALPHACLIP

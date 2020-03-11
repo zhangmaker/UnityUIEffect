@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: UIImage_Static_Blur7X7
-  m_Shader: {fileID: 4800000, guid: 656d2c5ced7301b4b81730672aac0cae, type: 3}
+  m_Name: UIImage_Static_Bloom
+  m_Shader: {fileID: 4800000, guid: 314b8f3352a75d7418e9041347b3d0ae, type: 3}
   m_ShaderKeywords: _EMISSION
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
@@ -56,7 +56,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _BlurDistance: 0.002
+    - _AdaptedLum: 0.78
+    - _BlurBlendFactor: 0.39
+    - _BlurDistance: 0.049
+    - _BlurLevel: 4.29
+    - _BlurSampleLevel: 3.33
     - _BumpScale: 1
     - _ColorMask: 15
     - _Cutoff: 0.5
@@ -78,9 +82,11 @@ Material:
     - _StencilReadMask: 255
     - _StencilWriteMask: 255
     - _UVSec: 0
+    - _UseACESToneMapping: 0
     - _UseUIAlphaClip: 0
     - _ZWrite: 1
     m_Colors:
-    - _ApplyChannel: {r: 1, g: 1, b: 1, a: 0.922}
+    - _BloomSampleThresholdColor: {r: 1, g: 1, b: 1, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _ThresholdColor: {r: 0, g: 0, b: 0, a: 0}
